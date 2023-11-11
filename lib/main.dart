@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 
-void main() => runApp(const MyApp());
+void main() {
+  runApp(const MyApp());
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -22,9 +25,10 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  bool botonesVisible = true;
   int min = 00;
   int seg = 00;
-  double letra_size = 113;
+  double letraSize = 113;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,19 +38,39 @@ class _MyHomePageState extends State<MyHomePage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              ElevatedButton(
-                  onPressed: () {
-                    aumentarValores('m++');
-                  },
-                  style: ElevatedButton.styleFrom(fixedSize: Size(100, 100)),
-                  child: Icon(Icons.keyboard_double_arrow_up)),
-              SizedBox(width: 65),
-              ElevatedButton(
-                  onPressed: () {
-                    aumentarValores('s++');
-                  },
-                  style: ElevatedButton.styleFrom(fixedSize: Size(100, 100)),
-                  child: Icon(Icons.keyboard_double_arrow_up))
+              botonesVisible
+                  ? ElevatedButton(
+                      onPressed: () {
+                        aumentarValores('m++');
+                      },
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.transparent,
+                          shadowColor: Colors.transparent,
+                          foregroundColor:
+                              const Color.fromARGB(255, 170, 170, 170),
+                          fixedSize: const Size(100, 100)),
+                      child: const Icon(
+                        Icons.keyboard_double_arrow_up,
+                        color: Color.fromARGB(255, 0, 0, 0),
+                      ))
+                  : Container(),
+              const SizedBox(width: 65),
+              botonesVisible
+                  ? ElevatedButton(
+                      onPressed: () {
+                        aumentarValores('s++');
+                      },
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.transparent,
+                          shadowColor: Colors.transparent,
+                          foregroundColor:
+                              const Color.fromARGB(255, 170, 170, 170),
+                          fixedSize: const Size(100, 100)),
+                      child: const Icon(
+                        Icons.keyboard_double_arrow_up,
+                        color: Colors.black,
+                      ))
+                  : Container()
             ],
           ),
           Row(
@@ -55,35 +79,76 @@ class _MyHomePageState extends State<MyHomePage> {
               SizedBox(
                 width: 130,
                 child: Center(
-                  child: Text('$min', style: TextStyle(fontSize: letra_size)),
+                  child: Text('$min', style: TextStyle(fontSize: letraSize)),
                 ),
               ),
-              Text(':', style: TextStyle(fontSize: letra_size)),
+              Text(':', style: TextStyle(fontSize: letraSize)),
               SizedBox(
                   width: 130,
                   child: Center(
-                    child: Text('$seg', style: TextStyle(fontSize: letra_size)),
+                    child: Text('$seg', style: TextStyle(fontSize: letraSize)),
                   )),
             ],
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              ElevatedButton(
-                  onPressed: () {
-                    aumentarValores('m--');
-                  },
-                  style: ElevatedButton.styleFrom(fixedSize: Size(100, 100)),
-                  child: const Icon(Icons.keyboard_double_arrow_down)),
+              botonesVisible
+                  ? ElevatedButton(
+                      onPressed: () {
+                        aumentarValores('m--');
+                      },
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.transparent,
+                          shadowColor: Colors.transparent,
+                          foregroundColor:
+                              const Color.fromARGB(255, 170, 170, 170),
+                          fixedSize: const Size(100, 100)),
+                      child: const Icon(
+                        Icons.keyboard_double_arrow_down,
+                        color: Colors.black,
+                      ))
+                  : Container(),
               const SizedBox(width: 65),
-              ElevatedButton(
-                  onPressed: () {
-                    aumentarValores('s--');
-                  },
-                  style: ElevatedButton.styleFrom(fixedSize: Size(100, 100)),
-                  child: const Icon(Icons.keyboard_double_arrow_down))
+              botonesVisible
+                  ? ElevatedButton(
+                      onPressed: () {
+                        aumentarValores('s--');
+                      },
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.transparent,
+                          shadowColor: Colors.transparent,
+                          foregroundColor:
+                              const Color.fromARGB(255, 170, 170, 170),
+                          fixedSize: const Size(100, 100)),
+                      child: const Icon(
+                        Icons.keyboard_double_arrow_down,
+                        color: Colors.black,
+                      ))
+                  : Container(),
             ],
           ),
+          const SizedBox(height: 100),
+          botonesVisible
+              ? SizedBox(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      if (activarFuncioIniciar()) {
+                        _showSnackBar(context);
+                      } else {
+                        iniciarTemporizador();
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.black,
+                        fixedSize: const Size(150, 150),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(100))),
+                    child:
+                        const Text('INICIAR', style: TextStyle(fontSize: 20)),
+                  ),
+                )
+              : Container(),
         ],
       ),
     );
@@ -119,6 +184,47 @@ class _MyHomePageState extends State<MyHomePage> {
             min = 55;
           }
       }
+    });
+  }
+
+  bool activarFuncioIniciar() {
+    if (min == 0 && seg == 0) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  void _showSnackBar(BuildContext context) {
+    // Muestra el SnackBar
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          'Ingrese un valor',
+          style: TextStyle(fontSize: 15),
+        ),
+        backgroundColor: Colors.red,
+        duration: Duration(
+            seconds: 3), // Opcional: establece la duración del SnackBar
+      ),
+    );
+  }
+
+  void iniciarTemporizador() {
+    botonesVisible = false;
+    Timer.periodic(const Duration(seconds: 1), (timer) {
+      setState(() {
+        if (min == 0 && seg == 0) {
+          botonesVisible = true;
+          timer.cancel();
+        } else {
+          seg = seg - 1;
+          if (min > 0 && seg < 0) {
+            min = min - 1;
+            seg = 59;
+          }
+        }
+      });
     });
   }
 }
