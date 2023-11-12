@@ -26,6 +26,8 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   bool botonesVisible = true;
+  bool habilitarPausar = false;
+  bool pausarT = false;
   int min = 00;
   int seg = 00;
   double letraSize = 113;
@@ -129,26 +131,30 @@ class _MyHomePageState extends State<MyHomePage> {
             ],
           ),
           const SizedBox(height: 100),
-          botonesVisible
-              ? SizedBox(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      if (activarFuncioIniciar()) {
-                        _showSnackBar(context);
-                      } else {
-                        iniciarTemporizador();
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black,
-                        fixedSize: const Size(150, 150),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(100))),
-                    child:
-                        const Text('INICIAR', style: TextStyle(fontSize: 20)),
-                  ),
-                )
-              : Container(),
+          SizedBox(
+            child: ElevatedButton(
+              onPressed: () {
+                if (activarFuncioIniciar()) {
+                  _showSnackBar(context);
+                } else {
+                  if (habilitarPausar) {
+                    pausarTemporizador();
+                  } else {
+                    iniciarTemporizador();
+                    pausarT = false;
+                  }
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.black,
+                  fixedSize: const Size(150, 150),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(100))),
+              child: habilitarPausar
+                  ? const Text('PAUSAR', style: TextStyle(fontSize: 20))
+                  : const Text('INICIAR', style: TextStyle(fontSize: 20)),
+            ),
+          )
         ],
       ),
     );
@@ -210,12 +216,23 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  void pausarTemporizador() => pausarT = true;
+
   void iniciarTemporizador() {
     botonesVisible = false;
+    habilitarPausar = true;
     Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (habilitarPausar && pausarT) {
+        setState(() {
+          botonesVisible = true;
+          habilitarPausar = false;
+        });
+        timer.cancel();
+      }
       setState(() {
         if (min == 0 && seg == 0) {
           botonesVisible = true;
+          habilitarPausar = false;
           timer.cancel();
         } else {
           seg = seg - 1;
