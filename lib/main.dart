@@ -34,6 +34,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 15, 15, 15),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -53,7 +54,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           fixedSize: const Size(100, 100)),
                       child: const Icon(
                         Icons.keyboard_double_arrow_up,
-                        color: Color.fromARGB(255, 0, 0, 0),
+                        color: Colors.white,
                       ))
                   : Container(),
               const SizedBox(width: 65),
@@ -70,7 +71,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           fixedSize: const Size(100, 100)),
                       child: const Icon(
                         Icons.keyboard_double_arrow_up,
-                        color: Colors.black,
+                        color: Colors.white,
                       ))
                   : Container()
             ],
@@ -81,14 +82,27 @@ class _MyHomePageState extends State<MyHomePage> {
               SizedBox(
                 width: 130,
                 child: Center(
-                  child: Text('$min', style: TextStyle(fontSize: letraSize)),
+                  child: ponerDosValoresMin()
+                      ? Text('0$min',
+                          style: TextStyle(
+                              fontSize: letraSize, color: Colors.white))
+                      : Text('$min',
+                          style: TextStyle(
+                              fontSize: letraSize, color: Colors.white)),
                 ),
               ),
-              Text(':', style: TextStyle(fontSize: letraSize)),
+              Text(':',
+                  style: TextStyle(fontSize: letraSize, color: Colors.white)),
               SizedBox(
                   width: 130,
                   child: Center(
-                    child: Text('$seg', style: TextStyle(fontSize: letraSize)),
+                    child: ponerDosValoresSeg()
+                        ? Text('0$seg',
+                            style: TextStyle(
+                                fontSize: letraSize, color: Colors.white))
+                        : Text('$seg',
+                            style: TextStyle(
+                                fontSize: letraSize, color: Colors.white)),
                   )),
             ],
           ),
@@ -108,7 +122,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           fixedSize: const Size(100, 100)),
                       child: const Icon(
                         Icons.keyboard_double_arrow_down,
-                        color: Colors.black,
+                        color: Colors.white,
                       ))
                   : Container(),
               const SizedBox(width: 65),
@@ -125,7 +139,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           fixedSize: const Size(100, 100)),
                       child: const Icon(
                         Icons.keyboard_double_arrow_down,
-                        color: Colors.black,
+                        color: Colors.white,
                       ))
                   : Container(),
             ],
@@ -146,7 +160,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 }
               },
               style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
+                  backgroundColor: Color.fromARGB(255, 124, 122, 105),
                   fixedSize: const Size(150, 150),
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(100))),
@@ -164,32 +178,28 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       switch (d) {
         case 's++':
-          seg = seg + 5;
-          if (seg >= 60) {
-            seg = 59;
+          seg = seg + 1;
+          if (seg > 60) {
+            seg = 60;
           }
         case 's--':
-          seg = seg - 5;
+          seg = seg - 1;
           if (seg < 0) {
             seg = 0;
           }
-          if (seg == 54) {
-            seg = 55;
-          }
         case 'm++':
-          min = min + 5;
-          if (min >= 60) {
-            min = 59;
+          min = min + 1;
+          if (min > 60) {
+            min = 60;
           }
         case 'm--':
-          min = min - 5;
-          if (min <= 0) {
+          min = min - 1;
+          if (min < 0) {
             min = 0;
           }
-          if (min == 54) {
-            min = 55;
-          }
       }
+      ponerDosValoresMin();
+      ponerDosValoresSeg();
     });
   }
 
@@ -216,12 +226,35 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  bool ponerDosValoresSeg() {
+    String segString = seg.toString();
+    int segLenght = segString.length;
+    if (segLenght > 1) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  bool ponerDosValoresMin() {
+    String minString = min.toString();
+    int minLenght = minString.length;
+
+    if (minLenght > 1) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
   void pausarTemporizador() => pausarT = true;
 
   void iniciarTemporizador() {
     botonesVisible = false;
     habilitarPausar = true;
-    Timer.periodic(const Duration(seconds: 1), (timer) {
+    Timer.periodic(const Duration(seconds: 1), (timer) async {
+      ponerDosValoresMin();
+      ponerDosValoresSeg();
       if (habilitarPausar && pausarT) {
         setState(() {
           botonesVisible = true;
